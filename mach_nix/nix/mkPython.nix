@@ -20,6 +20,7 @@ let
       providers ? {},  # define provider preferences
       python ? pythonGlobal,  # define python version
       requirements ? "",  # content from a requirements.txt file
+      envVars ? {}, # wrap python interpreter in environment variables
       tests ? false,  # Disable tests wherever possible to decrease build time.
       _ ? {},  # simplified overrides
       _providerDefaults ? l.makeProviderDefaults requirements,
@@ -128,7 +129,9 @@ let
         inherit ignoreCollisions;
         makeWrapperArgs =
           (map (p: "--suffix PATH : ${p}/bin") extra_pkgs_other)
-          ++ [''--set QT_PLUGIN_PATH ${py_final_with_pkgs}/plugins''];
+          ++ [''--set QT_PLUGIN_PATH ${py_final_with_pkgs}/plugins'']
+          ++ (lib.attrsets.values (lib.attrsets.mapAttrs (var: val: if elem var ["PATH" "QT_PLUGIN_PATH"] then
+            throw ''Don't set PATH and QT_PLUGIN_PATH in envVars argument'' else ''--set ${var} ${val}'') envVars));
       });
     in let
       self = final_env.overrideAttrs (oa: {
