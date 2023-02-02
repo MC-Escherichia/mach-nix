@@ -130,7 +130,7 @@ let
         makeWrapperArgs =
           (map (p: "--suffix PATH : ${p}/bin") extra_pkgs_other)
           ++ [''--set QT_PLUGIN_PATH ${py_final_with_pkgs}/plugins'']
-          ++ (attrsets.values (attrsets.mapAttrs (var: val: if elem var ["PATH" "QT_PLUGIN_PATH"] then
+          ++ (attrsets.attrValues (attrsets.mapAttrs (var: val: if elem var ["PATH" "QT_PLUGIN_PATH"] then
             throw ''Don't set PATH and QT_PLUGIN_PATH in envVars argument'' else ''--set ${var} ${val}'') envVars));
       });
     in let
